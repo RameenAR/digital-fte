@@ -1,6 +1,6 @@
-import type { FeaturedProduct } from '@/types/homepage'
+import type { Product } from '@/types/products'
 
-export const FEATURED_PRODUCTS_SEED: FeaturedProduct[] = [
+export const FEATURED_PRODUCTS_SEED: Product[] = [
   {
     id: 'prod-001',
     name: 'Midnight Rose',
@@ -15,6 +15,8 @@ export const FEATURED_PRODUCTS_SEED: FeaturedProduct[] = [
     scentTags: ['floral', 'oriental', 'woody', 'musky'],
     displayOrder: 1,
     isActive: true,
+    category: 'Floral',
+    createdAt: new Date('2026-02-01T00:00:00.000Z'),
   },
   {
     id: 'prod-002',
@@ -30,6 +32,8 @@ export const FEATURED_PRODUCTS_SEED: FeaturedProduct[] = [
     scentTags: ['oriental', 'woody', 'gourmand'],
     displayOrder: 2,
     isActive: true,
+    category: 'Oriental',
+    createdAt: new Date('2026-02-05T00:00:00.000Z'),
   },
   {
     id: 'prod-003',
@@ -45,6 +49,8 @@ export const FEATURED_PRODUCTS_SEED: FeaturedProduct[] = [
     scentTags: ['fresh', 'citrus', 'musky', 'green'],
     displayOrder: 3,
     isActive: true,
+    category: 'Fresh',
+    createdAt: new Date('2026-02-10T00:00:00.000Z'),
   },
   {
     id: 'prod-004',
@@ -60,6 +66,8 @@ export const FEATURED_PRODUCTS_SEED: FeaturedProduct[] = [
     scentTags: ['woody', 'green', 'fresh'],
     displayOrder: 4,
     isActive: true,
+    category: 'Woody',
+    createdAt: new Date('2026-02-15T00:00:00.000Z'),
   },
   {
     id: 'prod-005',
@@ -75,6 +83,8 @@ export const FEATURED_PRODUCTS_SEED: FeaturedProduct[] = [
     scentTags: ['oriental', 'woody', 'gourmand', 'musky'],
     displayOrder: 5,
     isActive: true,
+    category: 'Oriental',
+    createdAt: new Date('2026-02-20T00:00:00.000Z'),
   },
   {
     id: 'prod-006',
@@ -90,5 +100,7 @@ export const FEATURED_PRODUCTS_SEED: FeaturedProduct[] = [
     scentTags: ['floral', 'green', 'fresh', 'musky'],
     displayOrder: 6,
     isActive: true,
+    category: 'Floral',
+    createdAt: new Date('2026-02-25T00:00:00.000Z'),
   },
 ]

@@ -1,5 +1,8 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
+import { useState } from 'react'
 import type { FeaturedProduct } from '@/types/homepage'
 
 interface ProductCardProps {
@@ -7,6 +10,8 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const [imgError, setImgError] = useState(false)
+
   const scentPreview = [
     ...product.scentNotes.top.slice(0, 1),
     ...product.scentNotes.heart.slice(0, 1),
@@ -27,14 +32,23 @@ export default function ProductCard({ product }: ProductCardProps) {
     >
       {/* Product image */}
       <div className="relative aspect-[3/4] overflow-hidden bg-brand-cream">
-        <Image
-          src={product.imageUrl}
-          alt={`${product.name} perfume bottle`}
-          fill
-          loading="lazy"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+        {imgError ? (
+          /* Broken image fallback — gradient placeholder */
+          <div
+            className="absolute inset-0 bg-gradient-to-br from-brand-cream/40 to-brand-bark/20"
+            aria-hidden="true"
+          />
+        ) : (
+          <Image
+            src={product.imageUrl}
+            alt={`${product.name} perfume bottle`}
+            fill
+            loading="lazy"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            onError={() => setImgError(true)}
+          />
+        )}
 
         {/* Scent notes overlay — revealed on hover/focus */}
         <div
