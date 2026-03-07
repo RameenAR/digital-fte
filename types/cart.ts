@@ -17,6 +17,7 @@ export interface Cart {
 
 export type CartAction =
   | { type: 'ADD_ITEM'; payload: Omit<CartItem, 'quantity'> & { quantity: number } }
+  | { type: 'REMOVE_ITEM'; payload: { productId: string } }
   | { type: 'CLEAR_CART' }
 
 export const MAX_QUANTITY = 10
@@ -38,6 +39,8 @@ export function cartReducer(items: CartItem[], action: CartAction): CartItem[] {
       }
       return [...items, { ...itemData, quantity: Math.min(quantity, MAX_QUANTITY) }]
     }
+    case 'REMOVE_ITEM':
+      return items.filter((i) => i.productId !== action.payload.productId)
     case 'CLEAR_CART':
       return []
     default:

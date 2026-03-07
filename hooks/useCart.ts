@@ -11,9 +11,13 @@ export function useCart() {
     dispatch({ type: 'ADD_ITEM', payload: { ...item, quantity } })
   }
 
+  function removeFromCart(productId: string) {
+    dispatch({ type: 'REMOVE_ITEM', payload: { productId } })
+  }
+
   function clearCart() {
     dispatch({ type: 'CLEAR_CART' })
   }
 
-  return { items, totalItems, totalPrice, addToCart, clearCart }
+  return { items, totalItems, totalPrice, addToCart, removeFromCart, clearCart }
 }
