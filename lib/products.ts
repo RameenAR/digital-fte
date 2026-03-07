@@ -16,3 +16,13 @@ export async function getAllProducts(): Promise<Product[]> {
     (a, b) => a.displayOrder - b.displayOrder
   )
 }
+
+/**
+ * Returns a single active product by slug, or null if not found / inactive.
+ * In production this would query PostgreSQL via Prisma.
+ */
+export async function getProductBySlug(slug: string): Promise<Product | null> {
+  // TODO (v2): Replace with Prisma query:
+  // return prisma.product.findFirst({ where: { slug, isActive: true } })
+  return FEATURED_PRODUCTS_SEED.find((p) => p.slug === slug && p.isActive) ?? null
+}

@@ -5,6 +5,7 @@ import type { FeaturedProduct } from './homepage'
 export interface Product extends FeaturedProduct {
   category: string
   createdAt: Date
+  description: string
 }
 
 export type SortOption = 'bestselling' | 'price_asc' | 'price_desc' | 'newest'
