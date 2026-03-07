@@ -7,6 +7,7 @@ import ProductGrid from './ProductGrid'
 import ProductListingSkeleton from './ProductListingSkeleton'
 import SearchBar from './SearchBar'
 import FilterPanel from './FilterPanel'
+import FilterChips from './FilterChips'
 import SortDropdown from './SortDropdown'
 import Pagination from './Pagination'
 
@@ -15,19 +16,41 @@ interface ProductListingClientProps {
 }
 
 function ProductListingInner({ allProducts }: ProductListingClientProps) {
-  const { filterState, result, setFamilies, setPrice, setQuery, setSort, setPage, clearFilters } =
-    useProductFilters(allProducts)
+  const {
+    filterState,
+    result,
+    catalogMin,
+    catalogMax,
+    setFamilies,
+    setConcentrations,
+    setGenders,
+    setPrice,
+    setQuery,
+    setSort,
+    setPage,
+    clearFilters,
+  } = useProductFilters(allProducts)
 
   const [filterPanelOpen, setFilterPanelOpen] = useState(false)
 
   const hasActiveFilters =
     filterState.families.length > 0 ||
+    filterState.concentrations.length > 0 ||
+    filterState.genders.length > 0 ||
     filterState.minPrice !== null ||
-    filterState.maxPrice !== null
+    filterState.maxPrice !== null ||
+    !!filterState.query
+
+  const activeFilterCount =
+    filterState.families.length +
+    filterState.concentrations.length +
+    filterState.genders.length +
+    (filterState.minPrice !== null ? 1 : 0) +
+    (filterState.maxPrice !== null ? 1 : 0) +
+    (filterState.query ? 1 : 0)
 
   const handlePageChange = (page: number) => {
     setPage(page)
-    // Smooth scroll to product grid anchor
     const grid = document.getElementById('product-grid')
     if (grid) {
       grid.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -42,7 +65,7 @@ function ProductListingInner({ allProducts }: ProductListingClientProps) {
   return (
     <div>
       {/* Top controls row */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Search bar */}
         <div className="flex-1 max-w-sm">
           <SearchBar defaultValue={filterState.query} onSearch={setQuery} />
@@ -60,9 +83,7 @@ function ProductListingInner({ allProducts }: ProductListingClientProps) {
             Filters
             {hasActiveFilters && (
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-gold text-xs text-white font-bold">
-                {filterState.families.length +
-                  (filterState.minPrice !== null ? 1 : 0) +
-                  (filterState.maxPrice !== null ? 1 : 0)}
+                {activeFilterCount}
               </span>
             )}
           </button>
@@ -72,23 +93,43 @@ function ProductListingInner({ allProducts }: ProductListingClientProps) {
         </div>
       </div>
 
+      {/* Active filter chips */}
+      <FilterChips
+        filterState={filterState}
+        catalogMin={catalogMin}
+        catalogMax={catalogMax}
+        onRemoveQuery={() => setQuery('')}
+        onRemoveFamily={(f) => setFamilies(filterState.families.filter((x) => x !== f))}
+        onRemoveConcentration={(c) => setConcentrations(filterState.concentrations.filter((x) => x !== c))}
+        onRemoveGender={(g) => setGenders(filterState.genders.filter((x) => x !== g))}
+        onRemovePrice={() => setPrice(null, null)}
+        onClearAll={clearFilters}
+      />
+
       <div className="flex gap-8">
         {/* Filter panel — sidebar on desktop, drawer on mobile */}
         <aside
           id="filter-panel"
           className={`
             ${filterPanelOpen ? 'block' : 'hidden'} lg:block
-            w-full lg:w-56 shrink-0
+            w-full lg:w-64 shrink-0
           `}
         >
           <FilterPanel
             families={filterState.families}
+            concentrations={filterState.concentrations}
+            genders={filterState.genders}
             minPrice={filterState.minPrice}
             maxPrice={filterState.maxPrice}
+            catalogMin={catalogMin}
+            catalogMax={catalogMax}
             onFilterChange={(families, minPrice, maxPrice) => {
               setFamilies(families)
               setPrice(minPrice, maxPrice)
             }}
+            onConcentrationChange={setConcentrations}
+            onGenderChange={setGenders}
+            onPriceChange={setPrice}
             onClearFilters={clearFilters}
           />
         </aside>
