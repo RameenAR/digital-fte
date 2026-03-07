@@ -17,6 +17,8 @@ export const FEATURED_PRODUCTS_SEED: Product[] = [
     isActive: true,
     category: 'Floral',
     createdAt: new Date('2026-02-01T00:00:00.000Z'),
+    description:
+      'Midnight Rose is an ode to romance and mystery — a fragrance that blooms after dark. A bright opening of bergamot and black pepper gives way to a lush heart of Damask rose and jasmine, evoking a moonlit garden in full bloom. As the night deepens, a rich foundation of oud, amber, and musk anchors the fragrance in warmth and depth. Bold yet intimate, Midnight Rose is for those who leave a lasting impression.',
   },
   {
     id: 'prod-002',
@@ -34,6 +36,8 @@ export const FEATURED_PRODUCTS_SEED: Product[] = [
     isActive: true,
     category: 'Oriental',
     createdAt: new Date('2026-02-05T00:00:00.000Z'),
+    description:
+      'Saffron Dusk captures the golden hour between day and night — that fleeting moment when the sky burns amber and the air carries the warmth of ancient spice routes. Precious saffron and cardamom ignite the opening, before a heart of rose and supple leather adds elegance and edge. Sandalwood, vetiver, and amber form a slow-burning base that lingers like the warmth of a dying sun. Luxurious, complex, and deeply memorable.',
   },
   {
     id: 'prod-003',
@@ -51,6 +55,8 @@ export const FEATURED_PRODUCTS_SEED: Product[] = [
     isActive: true,
     category: 'Fresh',
     createdAt: new Date('2026-02-10T00:00:00.000Z'),
+    description:
+      'Coastal Breeze is freedom in a bottle — the feeling of standing at the edge of the sea, salt air filling your lungs. A sparkling opening of sea salt, lemon, and bergamot evokes the first breath of ocean wind. A delicate heart of white tea and violet brings softness and calm, like an afternoon of unhurried ease. Driftwood and musk in the base ground the fragrance with a quiet, enduring warmth. Light, effortless, and reviving.',
   },
   {
     id: 'prod-004',
@@ -68,6 +74,8 @@ export const FEATURED_PRODUCTS_SEED: Product[] = [
     isActive: true,
     category: 'Woody',
     createdAt: new Date('2026-02-15T00:00:00.000Z'),
+    description:
+      'Cedar Solstice marks the longest day — a fragrance as alive and full of energy as midsummer itself. Pink pepper and grapefruit burst forth with vibrant, zesty confidence, while a heart of iris and geranium brings an elegant green freshness. The dry-down reveals a forest floor of cedar, patchouli, and vetiver — earthy, grounding, and utterly assured. A bold signature for those who move through the world with quiet authority.',
   },
   {
     id: 'prod-005',
@@ -85,6 +93,8 @@ export const FEATURED_PRODUCTS_SEED: Product[] = [
     isActive: true,
     category: 'Oriental',
     createdAt: new Date('2026-02-20T00:00:00.000Z'),
+    description:
+      'Velvet Oud is our most opulent creation — a fragrance reserved for moments that demand presence. Sacred incense and rose open with ceremony, preparing the senses for a heart of rare oud and precious saffron. This is the beating soul of the fragrance: rich, resinous, and undeniably powerful. A warm base of vanilla, amber, and musk wraps everything in velvet luxury. For evenings that begin with intention and never want to end.',
   },
   {
     id: 'prod-006',
@@ -102,5 +112,7 @@ export const FEATURED_PRODUCTS_SEED: Product[] = [
     isActive: true,
     category: 'Floral',
     createdAt: new Date('2026-02-25T00:00:00.000Z'),
+    description:
+      'Garden at Dawn captures the most tender hour of the day — when dew still clings to petals and the world holds its breath before the sun rises. Crisp green leaves and morning dew open with an almost edible freshness, blooming into a heart of peony, lily of the valley, and jasmine that reads like a bouquet gathered by hand. White musk and sandalwood in the base offer a soft, skin-close warmth. Pure, romantic, and utterly serene.',
   },
 ]
