@@ -3,6 +3,8 @@ import {
   filterByFamily,
   filterByPrice,
   filterBySearch,
+  filterByConcentration,
+  filterByGender,
   sortProducts,
   paginate,
 } from '@/hooks/useProductFilters'
@@ -21,17 +23,19 @@ const makeProduct = (overrides: Partial<Product> = {}): Product => ({
   displayOrder: 1,
   isActive: true,
   category: 'Floral',
+  concentration: 'edp',
+  gender: 'unisex',
   createdAt: new Date('2026-01-01T00:00:00.000Z'),
   ...overrides,
 })
 
 const PRODUCTS: Product[] = [
-  makeProduct({ id: '1', name: 'Midnight Rose', price: 4500, scentTags: ['floral', 'musky'], displayOrder: 1, category: 'Floral', createdAt: new Date('2026-02-01') }),
-  makeProduct({ id: '2', name: 'Saffron Dusk', price: 5200, scentTags: ['oriental', 'woody'], displayOrder: 2, category: 'Oriental', createdAt: new Date('2026-02-05') }),
-  makeProduct({ id: '3', name: 'Coastal Breeze', price: 3800, scentTags: ['fresh', 'citrus'], displayOrder: 3, category: 'Fresh', createdAt: new Date('2026-02-10') }),
-  makeProduct({ id: '4', name: 'Cedar Solstice', price: 4100, scentTags: ['woody', 'green'], displayOrder: 4, category: 'Woody', createdAt: new Date('2026-02-15') }),
-  makeProduct({ id: '5', name: 'Velvet Oud', price: 6800, scentTags: ['oriental', 'woody', 'musky'], displayOrder: 5, category: 'Oriental', createdAt: new Date('2026-02-20') }),
-  makeProduct({ id: '6', name: 'Garden at Dawn', price: 3500, scentTags: ['floral', 'green', 'fresh'], displayOrder: 6, category: 'Floral', createdAt: new Date('2026-02-25') }),
+  makeProduct({ id: '1', name: 'Midnight Rose', price: 4500, scentTags: ['floral', 'musky'], displayOrder: 1, category: 'Floral', concentration: 'edp', gender: 'women', createdAt: new Date('2026-02-01') }),
+  makeProduct({ id: '2', name: 'Saffron Dusk', price: 5200, scentTags: ['oriental', 'woody'], displayOrder: 2, category: 'Oriental', concentration: 'parfum', gender: 'unisex', createdAt: new Date('2026-02-05') }),
+  makeProduct({ id: '3', name: 'Coastal Breeze', price: 3800, scentTags: ['fresh', 'citrus'], displayOrder: 3, category: 'Fresh', concentration: 'edt', gender: 'unisex', createdAt: new Date('2026-02-10') }),
+  makeProduct({ id: '4', name: 'Cedar Solstice', price: 4100, scentTags: ['woody', 'green'], displayOrder: 4, category: 'Woody', concentration: 'edp', gender: 'men', createdAt: new Date('2026-02-15') }),
+  makeProduct({ id: '5', name: 'Velvet Oud', price: 6800, scentTags: ['oriental', 'woody', 'musky'], displayOrder: 5, category: 'Oriental', concentration: 'parfum', gender: 'men', createdAt: new Date('2026-02-20') }),
+  makeProduct({ id: '6', name: 'Garden at Dawn', price: 3500, scentTags: ['floral', 'green', 'fresh'], displayOrder: 6, category: 'Floral', concentration: 'edt', gender: 'women', createdAt: new Date('2026-02-25') }),
 ]
 
 // ─── filterByFamily ───────────────────────────────────────────────────────────
@@ -195,5 +199,79 @@ describe('paginate', () => {
     expect(result.products).toHaveLength(0)
     expect(result.total).toBe(0)
     expect(result.totalPages).toBe(0)
+  })
+})
+
+// ─── filterByConcentration ────────────────────────────────────────────────────
+
+describe('filterByConcentration', () => {
+  it('returns all products when concentrations is empty', () => {
+    expect(filterByConcentration(PRODUCTS, [])).toHaveLength(6)
+  })
+
+  it('returns only edp products', () => {
+    const result = filterByConcentration(PRODUCTS, ['edp'])
+    expect(result).toHaveLength(2)
+    result.forEach((p) => expect(p.concentration).toBe('edp'))
+  })
+
+  it('returns only parfum products', () => {
+    const result = filterByConcentration(PRODUCTS, ['parfum'])
+    expect(result).toHaveLength(2)
+    result.forEach((p) => expect(p.concentration).toBe('parfum'))
+  })
+
+  it('returns OR logic — edp OR parfum', () => {
+    const result = filterByConcentration(PRODUCTS, ['edp', 'parfum'])
+    expect(result).toHaveLength(4)
+    result.forEach((p) =>
+      expect(['edp', 'parfum']).toContain(p.concentration)
+    )
+  })
+
+  it('returns empty array when no products match', () => {
+    expect(filterByConcentration(PRODUCTS, ['edt']).every((p) => p.concentration === 'edt')).toBe(true)
+  })
+
+  it('all three concentrations returns all products', () => {
+    expect(filterByConcentration(PRODUCTS, ['edp', 'edt', 'parfum'])).toHaveLength(6)
+  })
+})
+
+// ─── filterByGender ───────────────────────────────────────────────────────────
+
+describe('filterByGender', () => {
+  it('returns all products when genders is empty', () => {
+    expect(filterByGender(PRODUCTS, [])).toHaveLength(6)
+  })
+
+  it('returns only women products', () => {
+    const result = filterByGender(PRODUCTS, ['women'])
+    expect(result).toHaveLength(2)
+    result.forEach((p) => expect(p.gender).toBe('women'))
+  })
+
+  it('returns only men products', () => {
+    const result = filterByGender(PRODUCTS, ['men'])
+    expect(result).toHaveLength(2)
+    result.forEach((p) => expect(p.gender).toBe('men'))
+  })
+
+  it('returns OR logic — women OR unisex', () => {
+    const result = filterByGender(PRODUCTS, ['women', 'unisex'])
+    expect(result).toHaveLength(4)
+    result.forEach((p) =>
+      expect(['women', 'unisex']).toContain(p.gender)
+    )
+  })
+
+  it('returns only unisex products', () => {
+    const result = filterByGender(PRODUCTS, ['unisex'])
+    expect(result).toHaveLength(2)
+    result.forEach((p) => expect(p.gender).toBe('unisex'))
+  })
+
+  it('all three genders returns all products', () => {
+    expect(filterByGender(PRODUCTS, ['men', 'women', 'unisex'])).toHaveLength(6)
   })
 })

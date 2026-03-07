@@ -8,6 +8,8 @@ import type { FilterState, PaginatedResult, Product, SortOption } from '@/types/
 
 export const PAGE_SIZE = 12
 const VALID_SORT_OPTIONS: SortOption[] = ['bestselling', 'price_asc', 'price_desc', 'newest']
+const VALID_CONCENTRATIONS = ['edp', 'edt', 'parfum']
+const VALID_GENDERS = ['men', 'women', 'unisex']
 
 // ─── Pure filter pipeline functions ──────────────────────────────────────────
 
@@ -21,6 +23,24 @@ export function filterByFamily(products: Product[], families: string[]): Product
   return products.filter((p) =>
     p.scentTags.some((tag) => lowerFamilies.includes(tag.toLowerCase()))
   )
+}
+
+/**
+ * Filter products by concentration using OR logic.
+ * Empty concentrations array → returns all products.
+ */
+export function filterByConcentration(products: Product[], concentrations: string[]): Product[] {
+  if (concentrations.length === 0) return products
+  return products.filter((p) => concentrations.includes(p.concentration))
+}
+
+/**
+ * Filter products by gender using OR logic.
+ * Empty genders array → returns all products.
+ */
+export function filterByGender(products: Product[], genders: string[]): Product[] {
+  if (genders.length === 0) return products
+  return products.filter((p) => genders.includes(p.gender))
 }
 
 /**
@@ -103,6 +123,8 @@ export function paginate(products: Product[], page: number): PaginatedResult {
 function defaultFilterState(): FilterState {
   return {
     families: [],
+    concentrations: [],
+    genders: [],
     minPrice: null,
     maxPrice: null,
     query: '',
@@ -123,6 +145,24 @@ function parseSearchParams(params: URLSearchParams): FilterState {
         .split(',')
         .map((f) => f.trim().toLowerCase())
         .filter(Boolean)
+    : []
+
+  // concentrations: ?concentration=edp,parfum  (CSV; validated)
+  const concentrationParam = params.get('concentration')
+  const concentrations = concentrationParam
+    ? concentrationParam
+        .split(',')
+        .map((c) => c.trim().toLowerCase())
+        .filter((c) => VALID_CONCENTRATIONS.includes(c))
+    : []
+
+  // genders: ?gender=men,women  (CSV; validated)
+  const genderParam = params.get('gender')
+  const genders = genderParam
+    ? genderParam
+        .split(',')
+        .map((g) => g.trim().toLowerCase())
+        .filter((g) => VALID_GENDERS.includes(g))
     : []
 
   // minPrice / maxPrice
@@ -152,7 +192,7 @@ function parseSearchParams(params: URLSearchParams): FilterState {
       ? Math.floor(Number(pageRaw))
       : 1
 
-  return { families, minPrice, maxPrice, query, sort, page }
+  return { families, concentrations, genders, minPrice, maxPrice, query, sort, page }
 }
 
 /**
@@ -162,6 +202,8 @@ function parseSearchParams(params: URLSearchParams): FilterState {
 function serializeToParams(state: FilterState): URLSearchParams {
   const params = new URLSearchParams()
   if (state.families.length > 0) params.set('family', state.families.join(','))
+  if (state.concentrations.length > 0) params.set('concentration', state.concentrations.join(','))
+  if (state.genders.length > 0) params.set('gender', state.genders.join(','))
   if (state.minPrice !== null) params.set('minPrice', String(state.minPrice))
   if (state.maxPrice !== null) params.set('maxPrice', String(state.maxPrice))
   if (state.query) params.set('q', state.query)
@@ -175,7 +217,11 @@ function serializeToParams(state: FilterState): URLSearchParams {
 interface UseProductFiltersResult {
   filterState: FilterState
   result: PaginatedResult
+  catalogMin: number
+  catalogMax: number
   setFamilies: (families: string[]) => void
+  setConcentrations: (concentrations: string[]) => void
+  setGenders: (genders: string[]) => void
   setPrice: (min: number | null, max: number | null) => void
   setQuery: (query: string) => void
   setSort: (sort: SortOption) => void
@@ -187,6 +233,16 @@ export function useProductFilters(allProducts: Product[]): UseProductFiltersResu
   const searchParams = useSearchParams()
   const router = useRouter()
 
+  // Catalog price bounds — derived once from allProducts
+  const catalogMin = useMemo(
+    () => (allProducts.length > 0 ? Math.min(...allProducts.map((p) => p.price)) : 0),
+    [allProducts]
+  )
+  const catalogMax = useMemo(
+    () => (allProducts.length > 0 ? Math.max(...allProducts.map((p) => p.price)) : 0),
+    [allProducts]
+  )
+
   // Initialise state from URL params on mount
   const [filterState, setFilterStateRaw] = useState<FilterState>(() =>
     parseSearchParams(searchParams)
@@ -197,9 +253,11 @@ export function useProductFilters(allProducts: Product[]): UseProductFiltersResu
 
   // Apply the full filter pipeline
   const result = useMemo<PaginatedResult>(() => {
-    let products = filterByFamily(allProducts, filterState.families)
+    let products = filterBySearch(allProducts, filterState.query)
     products = filterByPrice(products, filterState.minPrice, filterState.maxPrice)
-    products = filterBySearch(products, filterState.query)
+    products = filterByFamily(products, filterState.families)
+    products = filterByConcentration(products, filterState.concentrations)
+    products = filterByGender(products, filterState.genders)
     products = sortProducts(products, filterState.sort)
     return paginate(products, filterState.page)
   }, [allProducts, filterState])
@@ -222,6 +280,18 @@ export function useProductFilters(allProducts: Product[]): UseProductFiltersResu
   const setFamilies = useCallback(
     (families: string[]) =>
       setFilterState((prev) => ({ ...prev, families, page: 1 })),
+    [setFilterState]
+  )
+
+  const setConcentrations = useCallback(
+    (concentrations: string[]) =>
+      setFilterState((prev) => ({ ...prev, concentrations, page: 1 })),
+    [setFilterState]
+  )
+
+  const setGenders = useCallback(
+    (genders: string[]) =>
+      setFilterState((prev) => ({ ...prev, genders, page: 1 })),
     [setFilterState]
   )
 
@@ -258,5 +328,18 @@ export function useProductFilters(allProducts: Product[]): UseProductFiltersResu
     [setFilterState]
   )
 
-  return { filterState, result, setFamilies, setPrice, setQuery, setSort, setPage, clearFilters }
+  return {
+    filterState,
+    result,
+    catalogMin,
+    catalogMax,
+    setFamilies,
+    setConcentrations,
+    setGenders,
+    setPrice,
+    setQuery,
+    setSort,
+    setPage,
+    clearFilters,
+  }
 }

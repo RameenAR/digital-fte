@@ -1,29 +1,58 @@
 'use client'
 
-import { useState } from 'react'
+import { CONCENTRATION_LABELS, GENDER_LABELS } from '@/types/products'
+import type { Concentration, Gender } from '@/types/products'
+import PriceRangeSlider from './PriceRangeSlider'
 
-const SCENT_FAMILIES = ['Floral', 'Woody', 'Oriental', 'Fresh', 'Gourmand', 'Green', 'Musky']
+const CONCENTRATIONS: { value: Concentration; label: string }[] = [
+  { value: 'edp', label: CONCENTRATION_LABELS.edp },
+  { value: 'edt', label: CONCENTRATION_LABELS.edt },
+  { value: 'parfum', label: CONCENTRATION_LABELS.parfum },
+]
+
+const GENDERS: { value: Gender; label: string }[] = [
+  { value: 'women', label: GENDER_LABELS.women },
+  { value: 'men', label: GENDER_LABELS.men },
+  { value: 'unisex', label: GENDER_LABELS.unisex },
+]
+
+const SCENT_FAMILIES = ['Floral', 'Woody', 'Oriental', 'Fresh', 'Citrus', 'Gourmand', 'Green', 'Musky']
 
 interface FilterPanelProps {
   families: string[]
+  concentrations: string[]
+  genders: string[]
   minPrice: number | null
   maxPrice: number | null
+  catalogMin: number
+  catalogMax: number
   onFilterChange: (families: string[], minPrice: number | null, maxPrice: number | null) => void
+  onConcentrationChange: (concentrations: string[]) => void
+  onGenderChange: (genders: string[]) => void
+  onPriceChange: (min: number | null, max: number | null) => void
   onClearFilters: () => void
 }
 
 export default function FilterPanel({
   families,
+  concentrations,
+  genders,
   minPrice,
   maxPrice,
+  catalogMin,
+  catalogMax,
   onFilterChange,
+  onConcentrationChange,
+  onGenderChange,
+  onPriceChange,
   onClearFilters,
 }: FilterPanelProps) {
-  const [minInput, setMinInput] = useState(minPrice !== null ? String(minPrice) : '')
-  const [maxInput, setMaxInput] = useState(maxPrice !== null ? String(maxPrice) : '')
-
   const activeCount =
-    families.length + (minPrice !== null ? 1 : 0) + (maxPrice !== null ? 1 : 0)
+    families.length +
+    concentrations.length +
+    genders.length +
+    (minPrice !== null ? 1 : 0) +
+    (maxPrice !== null ? 1 : 0)
 
   const toggleFamily = (family: string) => {
     const lower = family.toLowerCase()
@@ -33,16 +62,25 @@ export default function FilterPanel({
     onFilterChange(next, minPrice, maxPrice)
   }
 
-  const applyPrice = () => {
-    const min = minInput !== '' && !isNaN(Number(minInput)) ? Number(minInput) : null
-    const max = maxInput !== '' && !isNaN(Number(maxInput)) ? Number(maxInput) : null
-    onFilterChange(families, min, max)
+  const toggleConcentration = (value: string) => {
+    const next = concentrations.includes(value)
+      ? concentrations.filter((c) => c !== value)
+      : [...concentrations, value]
+    onConcentrationChange(next)
   }
 
-  const handleClear = () => {
-    setMinInput('')
-    setMaxInput('')
-    onClearFilters()
+  const toggleGender = (value: string) => {
+    const next = genders.includes(value)
+      ? genders.filter((g) => g !== value)
+      : [...genders, value]
+    onGenderChange(next)
+  }
+
+  const handlePriceChange = ([min, max]: [number, number]) => {
+    onPriceChange(
+      min === catalogMin ? null : min,
+      max === catalogMax ? null : max
+    )
   }
 
   return (
@@ -55,7 +93,7 @@ export default function FilterPanel({
         {activeCount > 0 && (
           <button
             type="button"
-            onClick={handleClear}
+            onClick={onClearFilters}
             className="font-sans text-xs text-brand-gold underline underline-offset-2 hover:text-brand-bark focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
           >
             Clear All
@@ -66,10 +104,52 @@ export default function FilterPanel({
         )}
       </div>
 
+      {/* Concentration checkboxes */}
+      <fieldset>
+        <legend className="mb-3 font-sans text-xs font-semibold uppercase tracking-wider text-brand-bark/60">
+          Category
+        </legend>
+        <div className="space-y-2">
+          {CONCENTRATIONS.map(({ value, label }) => (
+            <label key={value} className="flex cursor-pointer items-center gap-3 min-h-[44px]">
+              <input
+                type="checkbox"
+                checked={concentrations.includes(value)}
+                onChange={() => toggleConcentration(value)}
+                className="h-4 w-4 rounded border-brand-bark/40 text-brand-gold focus:ring-brand-gold focus:ring-offset-0"
+                aria-label={`Filter by ${label}`}
+              />
+              <span className="font-sans text-sm text-brand-black">{label}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      {/* Gender checkboxes */}
+      <fieldset>
+        <legend className="mb-3 font-sans text-xs font-semibold uppercase tracking-wider text-brand-bark/60">
+          Gender
+        </legend>
+        <div className="space-y-2">
+          {GENDERS.map(({ value, label }) => (
+            <label key={value} className="flex cursor-pointer items-center gap-3 min-h-[44px]">
+              <input
+                type="checkbox"
+                checked={genders.includes(value)}
+                onChange={() => toggleGender(value)}
+                className="h-4 w-4 rounded border-brand-bark/40 text-brand-gold focus:ring-brand-gold focus:ring-offset-0"
+                aria-label={`Filter by ${label}`}
+              />
+              <span className="font-sans text-sm text-brand-black">{label}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
       {/* Scent family checkboxes */}
       <fieldset>
         <legend className="mb-3 font-sans text-xs font-semibold uppercase tracking-wider text-brand-bark/60">
-          Scent Family
+          Fragrance Notes
         </legend>
         <div className="space-y-2">
           {SCENT_FAMILIES.map((family) => {
@@ -94,39 +174,18 @@ export default function FilterPanel({
         </div>
       </fieldset>
 
-      {/* Price range inputs */}
+      {/* Price range slider */}
       <fieldset>
         <legend className="mb-3 font-sans text-xs font-semibold uppercase tracking-wider text-brand-bark/60">
           Price Range (PKR)
         </legend>
-        <div className="space-y-3">
-          <label className="block">
-            <span className="sr-only">Minimum price</span>
-            <input
-              type="number"
-              min={0}
-              value={minInput}
-              onChange={(e) => setMinInput(e.target.value)}
-              onBlur={applyPrice}
-              placeholder="Min"
-              className="w-full rounded border border-brand-bark/30 px-3 py-2 font-sans text-sm text-brand-black placeholder-brand-bark/40 focus:border-brand-gold focus:outline-none focus:ring-1 focus:ring-brand-gold min-h-[44px]"
-              aria-label="Minimum price"
-            />
-          </label>
-          <label className="block">
-            <span className="sr-only">Maximum price</span>
-            <input
-              type="number"
-              min={0}
-              value={maxInput}
-              onChange={(e) => setMaxInput(e.target.value)}
-              onBlur={applyPrice}
-              placeholder="Max"
-              className="w-full rounded border border-brand-bark/30 px-3 py-2 font-sans text-sm text-brand-black placeholder-brand-bark/40 focus:border-brand-gold focus:outline-none focus:ring-1 focus:ring-brand-gold min-h-[44px]"
-              aria-label="Maximum price"
-            />
-          </label>
-        </div>
+        <PriceRangeSlider
+          min={catalogMin}
+          max={catalogMax}
+          value={[minPrice ?? catalogMin, maxPrice ?? catalogMax]}
+          onChange={handlePriceChange}
+          disabled={catalogMin === catalogMax}
+        />
       </fieldset>
     </div>
   )
