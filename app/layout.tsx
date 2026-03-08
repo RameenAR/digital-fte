@@ -2,7 +2,10 @@ import type { Metadata } from 'next'
 import { Cormorant_Garamond, Montserrat } from 'next/font/google'
 import './globals.css'
 import { CartProvider } from '@/context/CartContext'
+import { WishlistProvider } from '@/context/WishlistContext'
+import { ReviewsProvider } from '@/context/ReviewsContext'
 import CartBadge from '@/components/layout/CartBadge'
+import WishlistBadge from '@/components/layout/WishlistBadge'
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -37,23 +40,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${cormorant.variable} ${montserrat.variable}`}>
       <body>
         <CartProvider>
-          <header className="sticky top-0 z-50 border-b border-brand-bark/10 bg-brand-cream/95 backdrop-blur-sm">
-            <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-              <a href="/" className="font-serif text-xl text-brand-black hover:text-brand-gold transition-colors">
-                Lumière Parfums
-              </a>
-              <nav className="flex items-center gap-6">
-                <a
-                  href="/products"
-                  className="font-sans text-sm text-brand-bark hover:text-brand-gold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
-                >
-                  Collection
+          <WishlistProvider>
+            <ReviewsProvider>
+            <header className="sticky top-0 z-50 border-b border-brand-bark/10 bg-brand-cream/95 backdrop-blur-sm">
+              <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+                <a href="/" className="font-serif text-xl text-brand-black hover:text-brand-gold transition-colors">
+                  Lumière Parfums
                 </a>
-                <CartBadge />
-              </nav>
-            </div>
-          </header>
-          {children}
+                <nav className="flex items-center gap-6">
+                  <a
+                    href="/products"
+                    className="font-sans text-sm text-brand-bark hover:text-brand-gold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
+                  >
+                    Collection
+                  </a>
+                  <WishlistBadge />
+                  <CartBadge />
+                </nav>
+              </div>
+            </header>
+            {children}
+            </ReviewsProvider>
+          </WishlistProvider>
         </CartProvider>
       </body>
     </html>

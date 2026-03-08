@@ -8,6 +8,8 @@ import ScentNotesPyramid from '@/components/product-detail/ScentNotesPyramid'
 import ProductDescription from '@/components/product-detail/ProductDescription'
 import AddToCart from '@/components/product-detail/AddToCart'
 import RelatedProducts from '@/components/product-detail/RelatedProducts'
+import WishlistToggle from '@/components/wishlist/WishlistToggle'
+import ReviewsSection from '@/components/reviews/ReviewsSection'
 
 interface Props {
   params: { slug: string }
@@ -54,9 +56,14 @@ export default async function ProductDetailPage({ params }: Props) {
           <div className="flex flex-col gap-8">
             <ScentNotesPyramid scentNotes={product.scentNotes} />
             <ProductDescription description={product.description} />
+            <WishlistToggle
+              product={{ productId: product.id, slug: product.slug, name: product.name, imageUrl: product.imageUrl, price: product.price }}
+            />
             <AddToCart product={product} />
           </div>
         </div>
+
+        <ReviewsSection productId={product.id} />
 
         <RelatedProducts products={related} />
       </div>
