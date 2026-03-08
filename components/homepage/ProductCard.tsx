@@ -4,6 +4,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import type { FeaturedProduct } from '@/types/homepage'
+import WishlistToggle from '@/components/wishlist/WishlistToggle'
+import RatingBadge from '@/components/reviews/RatingBadge'
 
 interface ProductCardProps {
   product: FeaturedProduct
@@ -32,6 +34,10 @@ export default function ProductCard({ product }: ProductCardProps) {
     >
       {/* Product image */}
       <div className="relative aspect-[3/4] overflow-hidden bg-brand-cream">
+        <WishlistToggle
+          product={{ productId: product.id, slug: product.slug, name: product.name, imageUrl: product.imageUrl, price: product.price }}
+          className="absolute top-2 right-2 z-10 bg-white/80 backdrop-blur-sm"
+        />
         {imgError ? (
           /* Broken image fallback — gradient placeholder */
           <div
@@ -49,6 +55,8 @@ export default function ProductCard({ product }: ProductCardProps) {
             onError={() => setImgError(true)}
           />
         )}
+
+        <RatingBadge productId={product.id} className="absolute bottom-2 left-2 z-10" />
 
         {/* Scent notes overlay — revealed on hover/focus */}
         <div
