@@ -46,3 +46,9 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Scratch / generated projects
+my-app/
+
+# Claude
+.claude/settings.local.json
